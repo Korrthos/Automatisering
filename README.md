@@ -4,9 +4,12 @@ _Lavet d. 8/2/2023_
 
 Liste over de forskellige directories og hvilke komponenter de svarer til.
 
-* Koden til Arduino Megaen kører findes under `/src/Arduino.cpp`. Libraries der blev brugt:
+* Koden til Arduino Megaen kører findes under `/src/main.cpp`. Libraries der blev brugt:
     * `Arduino` af Arduino
     * `Servo` af Arduino
+* Koden Arduino Megaen også brugte (bare eksporteret til en anden fil) kan findes under `/src/maps.cpp`. Libraries der blev brugt:
+    * `Arduino` af Arduino
+    * `maps` som er en del af std
 
 * Koden som ESP'en kørte som styrede stepper motoren som blev brugt til at tage en m&m ad gangen findes under `/src/Stepper.cpp`. Libraries der blev brugt:
     * `Stepper` af Arduino
