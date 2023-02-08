@@ -2,18 +2,19 @@
 
 _Lavet d. 8/2/2023_
 
-Liste over de forskellige directories og hvilke komponenter de svarer til.
+Liste over de forskellige filer der svarer til hvad i projektet, og hvilke libraries der er blevet brugt.
 
-* Koden til Arduino Megaen kører findes under `/src/main.cpp`. Libraries der blev brugt:
+* Koden til Arduino Megaen findes under `/src/main.cpp`. Libraries der blev brugt:
     * `Arduino` af Arduino
     * `Servo` af Arduino
-* Koden Arduino Megaen også brugte (bare eksporteret til en anden fil) kan findes under `/src/maps.cpp`. Libraries der blev brugt:
+* Arduino Megaen bruger også filen `/src/maps.cpp`. Libraries der blev brugt:
     * `Arduino` af Arduino
     * `maps` som er en del af std
 
-* Koden som ESP'en kørte som styrede stepper motoren som blev brugt til at tage en m&m ad gangen findes under `/src/Stepper.cpp`. Libraries der blev brugt:
+* Koden som ESP'en brugte til at styre steppermotoren som blev brugt til at tage en M&M ad gangen findes under `/src/Stepper.cpp`. Libraries der blev brugt:
     * `Stepper` af Arduino
 
-* Python koden som kørte på Raspberry Pi'en til at genkende farverne af en af M&M'sne kan findes under `/src/color.py`. Libraries der blev brugt:
+* Python koden som kørte på Raspberry Pi'en til at genkende farverne af kan findes under `/src/color.py`. Libraries der blev brugt:
     * `OpenCV` af Intel
-    * `numpy` er et open source fællesprojekt med originalt skrevet af Travis Oliphant.
+    * `numpy` er et fælles open source projekt originalt skrevet af Travis Oliphant.
+    * `pySerial` er et fælles open source source projekt.
