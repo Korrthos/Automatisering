@@ -73,16 +73,8 @@ while(True):
     # nimageFrame = cv2.resize(imageFrame, (0, 0), fx = 1, fy = 1);
     hsvFrame = cv2.cvtColor(imageFrame, cv2.COLOR_BGR2HSV)
     cv2.imshow('hsv', hsvFrame)
-    masks = {}
     for color in colors:
         mask = makeMask(hsvFrame, color)
-        masks[color] = mask
-
-    kernel = np.ones((5, 5), "uint8")
-    for color in colors:
-        mask, kernel = morph(imageFrame, masks[color], kernel)
-
-    for color in colors:
         imageFrame = makeContour(imageFrame, masks[color], color)
 
     # Program Termination
