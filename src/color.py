@@ -3,30 +3,40 @@ import numpy as np
 import cv2
 
 # serial communication
-Serial = serial.Serial('/dev/ttyUSB0', 9600, timeout=1)
+Serial = serial.Serial('COM4', 9600, timeout=1)
 Serial.reset_input_buffer()
 
 # color array
-colors = ["RED", "BLUE", "GREEN", "YELLOW", "ORANGE", "BROWN"]
+colors = ["RED", "GREEN", "BLUE", "YELLOW", "ORANGE", "BROWN"]
 
 # make color dicts:
 colors_lower = {
-    "RED":      [  0, 174, 119 ],
-    "GREEN":    [ 58, 54,  79  ],
-    "BLUE":     [ 94, 216, 78  ],
-    "YELLOW":   [  8, 90,  142 ],
-    "ORANGE":   [  0, 131, 150 ],
-    "BROWN":    [  0, 113,  51 ],
+    "RED":      [  0,   185,  126 ],
+    "GREEN":    [ 31,    82,  77  ],
+    "BLUE":     [ 98,   162,  44  ],
+    "YELLOW":   [ 11,   105,  130 ],
+    "ORANGE":   [  2,   142,  151 ],
+    "BROWN":    [  0,   106,  53  ] 
 }
 
 colors_upper = {
-    "RED":      [ 15, 214, 199 ],
-    "GREEN":    [ 78,  94, 159 ],
-    "BLUE":     [114, 255, 158 ],
-    "YELLOW":   [ 28, 130, 222 ],
-    "ORANGE":   [ 20, 171, 230 ],
-    "BROWN":    [ 17, 153, 131 ]
+    "RED":      [ 17,   205,  146 ],
+    "GREEN":    [ 51,   122,  157 ],
+    "BLUE":     [ 118,  202,  124 ],
+    "YELLOW":   [ 31,   145,  210 ],
+    "ORANGE":   [ 22,   172,  181 ],
+    "BROWN":    [ 20,   146,  133 ]
 }
+
+colors_disp = {
+    "RED":      (   97, 97, 248 ),
+    "GREEN":    (  91, 216, 56  ),
+    "BLUE":     ( 208, 129, 15  ),
+    "YELLOW":   (   0, 217, 253 ),
+    "ORANGE":   (  54, 148, 255 ),
+    "BROWN":    ( 102, 102, 155 ),
+}
+
 
 # get black & white mask
 def makeMask(hsvFrame, color):
@@ -36,17 +46,21 @@ def makeMask(hsvFrame, color):
     return mask
 
 # use black and white mask to check if the areas of a specific mask is over 300.
-def makeContour(mask):
-    found = 0
+def makeContour(mask, imageFrame, color):
+    col = colors_disp[color]
+    found_color = False
     contours, hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     for pic, contour in enumerate(contours):
         area = cv2.contourArea(contour)
         if(area > 300):
-            found += 1
+            found_color = True
+            x, y, w, h = cv2.boundingRect(contour)
+            imageFrame = cv2.rectangle(imageFrame, (x, y), (x + w, y + h), col, 2)
+            cv2.putText(imageFrame, f"{color} color", (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1.0, col)
 
-    return found
+    return found_color, imageFrame
 
-webcam = cv2.VideoCapture(0)
+webcam = cv2.VideoCapture(1)
 
 found = dict(zip( [color for color in colors], [0 for _ in range(6)] ))
 # found = {
@@ -58,23 +72,33 @@ found = dict(zip( [color for color in colors], [0 for _ in range(6)] ))
 #     "BROWN":  0
 # }
 
-FRAME_CHECK = 10
+
+print("Starting!")
+FRAME_CHECK = 15
 frame_counter = 0
+lastSent = ""
 while(True):
     
     _, imageFrame = webcam.read()
     hsvFrame = cv2.cvtColor(imageFrame, cv2.COLOR_BGR2HSV)
     for color in colors:
         mask = makeMask(hsvFrame, color)
-        found[color] = makeContour(mask)
+        found_color, imageFrame = makeContour(mask, imageFrame, color)
+        found[color] += 1 if found_color else 0
 
     frame_counter = (frame_counter + 1) % FRAME_CHECK 
     if frame_counter == 0:
+        highest = ("", 0)
         for (color, val) in found.items():
-            if val > 6:
-                Serial.write(bytes(color, 'utf-8'))
-                found[color] = 0
-            
+            if val > 7:
+                if val > highest[1]:
+                    highest = (color, val)
+            found[color] = 0
+        if highest[0] != "" and highest[0] != lastSent:
+            lastSent = highest[0]
+            print(lastSent)
+            Serial.write(bytes(highest[0], 'ascii'))
+    cv2.imshow('recognition', imageFrame) 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         webcam.release()
         break
