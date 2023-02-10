@@ -2,14 +2,14 @@ import serial
 import numpy as np
 import cv2
 
-# serial communication
+# Serial communication
 Serial = serial.Serial('COM4', 9600, timeout=1)
 Serial.reset_input_buffer()
 
-# color array
+# Farve array
 colors = ["RED", "GREEN", "BLUE", "YELLOW", "ORANGE", "BROWN"]
 
-# make color dicts:
+# Lav farve dicts:
 colors_lower = {
     "RED":      [  0,   185,  126 ],
     "GREEN":    [ 31,    82,  77  ],
@@ -38,14 +38,14 @@ colors_disp = {
 }
 
 
-# get black & white mask
+# Få en sort og hvid farvemaske ud fra nedre og øvre grænseværdier
 def makeMask(hsvFrame, color):
     color_lower = np.array(colors_lower[color], np.uint8)
     color_upper = np.array(colors_upper[color], np.uint8)
     mask = cv2.inRange(hsvFrame, color_lower, color_upper)
     return mask
 
-# use black and white mask to check if the areas of a specific mask is over 300.
+# Brug farvemasken til at tjekke hvis et af områderne har et areal som er over 300 pixels.
 def makeContour(mask, imageFrame, color):
     col = colors_disp[color]
     found_color = False
@@ -60,7 +60,7 @@ def makeContour(mask, imageFrame, color):
 
     return found_color, imageFrame
 
-webcam = cv2.VideoCapture(1)
+webcam = cv2.VideoCapture(0)
 
 found = dict(zip( [color for color in colors], [0 for _ in range(6)] ))
 # found = {
