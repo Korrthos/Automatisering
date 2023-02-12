@@ -60,8 +60,8 @@ def makeContour(mask, imageFrame, color):
 
     return found_color, imageFrame
 
+# Start webcam og initialiser dictionary som holder styr på hvor mange farver der er fundet
 webcam = cv2.VideoCapture(0)
-
 found = dict(zip( [color for color in colors], [0 for _ in range(6)] ))
 # found = {
 #     "RED":    0,
@@ -72,33 +72,42 @@ found = dict(zip( [color for color in colors], [0 for _ in range(6)] ))
 #     "BROWN":  0
 # }
 
-
+# Start main loop
 print("Starting!")
 FRAME_CHECK = 15
 frame_counter = 0
 lastSent = ""
 while(True):
     
+    # Få en frame fra webcammet og konverter den til HSV.
     _, imageFrame = webcam.read()
     hsvFrame = cv2.cvtColor(imageFrame, cv2.COLOR_BGR2HSV)
+    
+    # Loop igennem farverne
     for color in colors:
+        # Få mask
         mask = makeMask(hsvFrame, color)
+        # Få den modificerede (kosmetiske) imageFrame og få om farven blev fundet.
         found_color, imageFrame = makeContour(mask, imageFrame, color)
+        
+        # Hvis den blev fundet, gem det.
         found[color] += 1 if found_color else 0
 
+    # Inkrementer frame tælleren
     frame_counter = (frame_counter + 1) % FRAME_CHECK 
-    if frame_counter == 0:
-        highest = ("", 0)
+    if frame_counter == 0: # Gå igennem følgende loop hver 15'ne frame
+        highest = ("", 0) # Variabel til at gemme den farve der er mest af
         for (color, val) in found.items():
-            if val > 7:
+            if val > 7: # Tjek om farven blev fundet i over halvdelen af frames'ne. Hvis den er, tjek om den er der i flere frames end den anden som var fundet til at være der flest gange
                 if val > highest[1]:
                     highest = (color, val)
             found[color] = 0
+        # Tjek om der er fundet en højeste, og tjek at den ikke er den sidste sendte for at tage højde for serial communication
         if highest[0] != "" and highest[0] != lastSent:
             lastSent = highest[0]
             print(lastSent)
-            Serial.write(bytes(highest[0], 'ascii'))
-    cv2.imshow('recognition', imageFrame) 
+            Serial.write(bytes(highest[0], 'ascii')) # Encode som bytes og send over Serial
+    cv2.imshow('recognition', imageFrame) # Vis image feed som viser det kameraet ser.
     if cv2.waitKey(1) & 0xFF == ord('q'):
         webcam.release()
         break
