@@ -7,7 +7,7 @@ Liste over de forskellige filer der svarer til hvad i projektet, og hvilke libra
 * Koden til Arduino Megaen findes under `/src/main.cpp`. Libraries der blev brugt:
     * `Servo` af Arduino
 
-* Koden som ESP'en brugte til at styre steppermotoren som blev brugt til at tage en M&M ad gangen findes under `/src/Stepper.cpp`. Libraries der blev brugt:
+* Koden som ESP'en brugte til at styre steppermotoren som blev brugt til at tage en M&M ad gangen findes under `/src/stepper.cpp`. Libraries der blev brugt:
     * `Stepper` af Arduino
 
 * Python koden som kørte på Raspberry Pi'en til at genkende farverne af kan findes under `/src/color.py`. Libraries der blev brugt:
